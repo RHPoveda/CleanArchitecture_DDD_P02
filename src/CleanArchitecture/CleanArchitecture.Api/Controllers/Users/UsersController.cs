@@ -1,4 +1,5 @@
 using CleanArchitecture.Application.Users.LoginUser;
+using CleanArchitecture.Application.Users.RegisterUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ public class UsersController : ControllerBase
     }
 
     [AllowAnonymous]
+    [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromBody] LoginUserRequest request,
         CancellationToken cancellationToken
@@ -25,7 +27,7 @@ public class UsersController : ControllerBase
         var command = new LoginCommand(request.Email, request.Password);
         var result = await _sender.Send(command, cancellationToken);
 
-        if(result.IsFailure)
+        if (result.IsFailure)
         {
             return Unauthorized(result.Error);
         }
@@ -33,5 +35,21 @@ public class UsersController : ControllerBase
         return Ok(result.Value);
     }
 
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(
+       [FromBody] RegisterUserRequest request,
+       CancellationToken cancellationToken
+   )
+    {
+        var command = new RegisterUserCommand(request.Email, request.Nombre, request.Apellidos, request.Password);
+        var result = await _sender.Send(command, cancellationToken);
 
+        if (result.IsFailure)
+        {
+            return Unauthorized(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
 }
