@@ -28,10 +28,11 @@ public static class DependencyInjection
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
         services.AddTransient<IEmailService, EmailService>();
 
-        var connectionString = configuration.GetConnectionString("Database") 
+        var connectionString = configuration.GetConnectionString("ConnectionStrings")
              ?? throw new ArgumentNullException(nameof(configuration));
 
-        services.AddDbContext<ApplicationDbContext>(options => {
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });
 
@@ -41,7 +42,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
-services.AddSingleton<ISqlConnectionFactory>( _ => new SqlConnectionFactory(connectionString));
+        services.AddSingleton<ISqlConnectionFactory>(_ => new SqlConnectionFactory(connectionString));
 
         SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
         return services;
